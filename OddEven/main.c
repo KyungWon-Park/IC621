@@ -86,10 +86,17 @@ int main(void)
 		problem_set = randGen_IntArr(problem_set_size);
 		// WARNING: FILE OPEN
 		FILE *f = fopen("input.txt", "w");
-		int i;
-		for (i = 0; i < problem_set_size; i++)
+		if (f == NULL)
 		{
-			fprintf(f, "%d\n", problem_set[i]);
+			printf("Cannot open file for write. Ignoring...\n");
+		}
+		else
+		{
+			int i;
+			for (i = 0; i < problem_set_size; i++)
+			{
+				fprintf(f, "%d\n", problem_set[i]);
+			}
 		}
 		fclose(f);
 		printf("Initialization complete. Starting main routine...\n");
@@ -182,15 +189,22 @@ int main(void)
 		printf("Sorting has been finished. Elapsed time: %lf\n", t_bench);
 		// WARNING: FILE OPEN
 		FILE *f_out = fopen("output.txt", "w");
-		int i;
-		for (i = 0; i < problem_set_size; i++)
+		if (f_out == NULL)
 		{
-			fprintf(f_out, "%d\n", problem_set[i]);
+			printf("Cannot open file for write. Ignoring...\n");
 		}
-		fclose(f_out);
-		f_out = fopen("report.txt", "w");
-		fprintf(f_out, "Problem set size: %d MB\n", 4 * problem_set_size / (1024 * 1024));
-		fprintf(f_out, "Elapsed time: %lf\n", t_bench);
+		else 
+		{
+			int i;
+			for (i = 0; i < problem_set_size; i++)
+			{
+				fprintf(f_out, "%d\n", problem_set[i]);
+			}
+			fclose(f_out);
+			f_out = fopen("report.txt", "w");
+			fprintf(f_out, "Problem set size: %d MB\n", 4 * problem_set_size / (1024 * 1024));
+			fprintf(f_out, "Elapsed time: %lf\n", t_bench);
+		}
 		fclose(f_out);
 
 		free(problem_set);
