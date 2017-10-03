@@ -115,14 +115,14 @@ int main(void)
 	int head_Mine, head_notMine;
 	int *tmp_ptr;
 
-	// Stand in starting line
-	MPI_Barrier(MPI_COMM_WORLD);
-
 	// Start odd even transposition sorting
 	for (phase = 0; phase < comm_sz; phase++)
 	{
 		// Sex
 		partner = findPartner(phase, my_rank, comm_sz);
+
+		// Synchronization
+		MPI_Barrier(MPI_COMM_WORLD);
 		if (partner != NO_PARTNER)
 		{
 			// Exchange arr 
@@ -172,9 +172,6 @@ int main(void)
 			arr_Mine = arr_beMine;
 			arr_beMine = tmp_ptr;
 		}
-
-		// Synchronization
-		MPI_Barrier(MPI_COMM_WORLD);
 	}
 
 	// Gather results
