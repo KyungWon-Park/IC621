@@ -1,13 +1,9 @@
 // Quicksort 
-#include <time.h>
 #include <stdlib.h>
 #include <assert.h>
 
 void QuickSort_IntArr(int *arr, int size)
 {
-	// Random number generator
-	srand((unsigned) time(NULL));
-
 	// Stack initialization
 	int *stack = malloc(sizeof(int) * size);
 	assert(stack != NULL);
@@ -18,47 +14,48 @@ void QuickSort_IntArr(int *arr, int size)
 	stack[++stack_ptr] = (size - 1);
 	
 	// Internal variables
-	int high, low, pivot;
+	int high, low, x;
 	int partition_index;
+	int pivot_index;
 	int tmp;
 	int i;
 
 	// Work till the stack is empty
-	while (stack_ptr > 0)
+	while (stack_ptr >= 0)
 	{
 		// Pop high and low index from the stack
 		high = stack[stack_ptr--];
 		low  = stack[stack_ptr--];
 
 		// Set the pivot and partition the array
-		pivot = rand() % (high - low + 1);
+		x = arr[high];
 		partition_index = low - 1;
 		for (i = low; i <= high - 1; i++)
 		{
-			if (arr[i] <= pivot)
+			if (arr[i] <= x)
 			{
 				partition_index++;
 				tmp = arr[partition_index];
 				arr[partition_index] = arr[i];
-				arr[partition_index] = tmp;
+				arr[i] = tmp;
 			}
 		}
 		tmp = arr[partition_index + 1];
 		arr[partition_index + 1] = arr[high];
 		arr[high] = tmp;
-		pivot = partition_index + 1;
+		pivot_index = partition_index + 1;
 
 		// Check left side of the pivot, push them if necessary
-		if (pivot - 1 > low)
+		if (pivot_index - 1 > low)
 		{
 			stack[++stack_ptr] = low;
-			stack[++stack_ptr] = pivot - 1;
+			stack[++stack_ptr] = pivot_index - 1;
 		}
 		
 		// Check right side of the pivot, push them if necessary
-		if (pivot + 1 < high)
+		if (pivot_index + 1 < high)
 		{
-			stack[++stack_ptr] = pivot + 1;
+			stack[++stack_ptr] = pivot_index + 1;
 			stack[++stack_ptr] = high;
 		}
 	}
