@@ -1,8 +1,12 @@
 #include <mpi.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <assert.h>
 #include <time.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include "quicksort.h"
 #define NO_PARTNER -24425195
 
@@ -46,7 +50,7 @@ int findPartner(int phase, int my_rank, int comm_sz)
 }
 
 
-int main(void)
+int main(int argc, char *argv[])
 {
 	// MPI initialization
 	int comm_sz = -1;
@@ -58,13 +62,36 @@ int main(void)
 	
 	// Tell problem set size
 	int problem_set_size;
-	if (my_rank == 0)
+	// Shell prompt for problem set size
+	if (my_rank == 0 && (argc == 1))
 	{
 		printf("Enter problem set size ( * M integer keys): ");
 		scanf("%d", &problem_set_size);
-		problem_set_size = problem_set_size * 1024 * 1024;
 	}
+	else 
+	{
+		problem_set_size = atoi(argv[1]); 
+	}
+
+	problem_set_size = problem_set_size * 1024 * 1024;
 	MPI_Bcast(&problem_set_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
+	
+	char output_dir[255];
+	char output_path[255];	// For later use;
+	// Make a directory for output
+	if (my_rank == 0)
+	{
+		getcwd(output_dir, 255);	
+		sprintf(output_dir, "%d", comm_sz);
+		strcat(output_dir, "_nodes_");
+		sprintf(output_dir, "%d", (problem_set_size / (1024 * 1024)));
+		strcat(output_dir, "_M_keys_Result");
+		struct stat dir_stat;
+		if (stat(output_dir, &dir_stat) == -1)
+		{
+			mkdir(output_dir, 0755);
+		}
+	}
 	
 	// Problem set distribution
 	int local_set_sz = problem_set_size / comm_sz;
@@ -85,7 +112,9 @@ int main(void)
 		// WARNING: MALLOC
 		problem_set = randGen_IntArr(problem_set_size);
 		// WARNING: FILE OPEN
-		FILE *f = fopen("input.txt", "w");
+		strcat(output_path, output_dir);
+		strcat(output_path, "input.txt");
+		FILE *f = fopen(output_path, "w");
 		if (f == NULL)
 		{
 			printf("Cannot open file for write. Ignoring...\n");
@@ -99,6 +128,7 @@ int main(void)
 			}
 		}
 		fclose(f);
+		strcpy(output_path, "");
 		printf("Initialization complete. Starting main routine...\n");
 	}
 	double t_start, t_finish, t_elapsed;
@@ -185,7 +215,9 @@ int main(void)
 	{
 		printf("Sorting has been finished. Elapsed time: %lf\n", t_bench);
 		// WARNING: FILE OPEN
-		FILE *f_out = fopen("output.txt", "w");
+		strcat(output_path, output_dir);
+		strcat(output_path, "output_txt");
+		FILE *f_out = fopen(output_path, "w");
 		if (f_out == NULL)
 		{
 			printf("Cannot open file for write. Ignoring...\n");
@@ -198,11 +230,16 @@ int main(void)
 				fprintf(f_out, "%d\n", problem_set[i]);
 			}
 			fclose(f_out);
-			f_out = fopen("report.txt", "w");
-			fprintf(f_out, "Problem set size: %d MB\n", 4 * problem_set_size / (1024 * 1024));
+			strcpy(output_path, "");
+
+			strcat(output_path, output_dir);
+			strcat(output_path, "report.txt");
+			f_out = fopen(output_path, "w");
+			fprintf(f_out, "Problem set size: %d M integer keys\n", problem_set_size / (1024 * 1024));
 			fprintf(f_out, "Elapsed time: %lf\n", t_bench);
 		}
 		fclose(f_out);
+		strcpy(output_path, "");
 
 		free(problem_set);
 	}
