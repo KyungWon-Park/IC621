@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
 	
 	if (my_rank == 0)
 	{
-		printf("Sorting has been finished. Elapsed time: %lf\n", t_bench);
+		printf("Sorting has been finished. Elapsed time: %lf sec\n", t_bench);
 		// WARNING: FILE OPEN
 		strcat(output_path, output_dir);
 		strcat(output_path, "sorted.txt");
@@ -238,7 +238,7 @@ int main(int argc, char *argv[])
 			strcat(output_path, "jobReport.txt");
 			f_out = fopen(output_path, "w");
 			fprintf(f_out, "Problem set size: %d M integer keys\n", problem_set_size / (1024 * 1024));
-			fprintf(f_out, "Elapsed time: %lf\n", t_bench);
+			fprintf(f_out, "Elapsed time: %lf sec\n", t_bench);
 		}
 		fclose(f_out);
 		strcpy(output_path, "");
