@@ -1,11 +1,14 @@
 CC = mpicc 
 FLAG = -O3 
 
-clean:
-	rm *.o oddeven 
-
 all: main.o quicksort.o
 	$(CC) $(FLAG) main.o quicksort.o -o oddeven 
+
+rmtxt:
+	rm *.txt 
+
+clean:
+	rm *.o oddeven  
 
 main.o: main.c
 	$(CC) $(FLAG) -c main.c 
