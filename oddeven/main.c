@@ -217,7 +217,7 @@ int main(int argc, char *argv[])
 		printf("Sorting has been finished. Elapsed time: %lf\n", t_bench);
 		// WARNING: FILE OPEN
 		strcat(output_path, output_dir);
-		strcat(output_path, "sorted_txt");
+		strcat(output_path, "sorted.txt");
 		FILE *f_out = fopen(output_path, "w");
 		if (f_out == NULL)
 		{
