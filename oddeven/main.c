@@ -76,9 +76,9 @@ int main(int argc, char *argv[])
 	problem_set_size = problem_set_size * 1024 * 1024;
 	MPI_Bcast(&problem_set_size, 1, MPI_INT, 0, MPI_COMM_WORLD);
 
-	char buf[255];
-	char output_dir[255];
-	char output_path[255];	// For later use;
+	char buf[255] = "";
+	char output_dir[255] = "";
+	char output_path[255] = "";	// For later use;
 	// Prepare for output
 	if (my_rank == 0)
 	{
