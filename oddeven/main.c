@@ -82,6 +82,7 @@ int main(int argc, char *argv[])
 	// Prepare for output
 	if (my_rank == 0)
 	{
+		strcpy(output_dir, "");
 		getcwd(output_dir, 255);
 		strcat(output_dir, "/");
 		sprintf(buf, "%d", comm_sz);
