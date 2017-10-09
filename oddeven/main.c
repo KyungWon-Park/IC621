@@ -54,7 +54,7 @@ int main(void)
 	MPI_Init(NULL, NULL);
 	MPI_Comm_size(MPI_COMM_WORLD, &comm_sz);
 	MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
-	assert((comm_sz < 0 || my_rank < 0) && "MPI initialization failed\n");
+	assert(!(comm_sz < 0 || my_rank < 0) && "MPI initialization failed\n");
 	
 	// Tell problem set size
 	int problem_set_size;
@@ -103,7 +103,7 @@ int main(void)
 	}
 	double t_start, t_finish, t_elapsed;
 	t_start = MPI_Wtime();
-	MPI_Scatter(problem_set, local_set_sz, MPI_INT, arr_Mine, local_set_sz,MPI_INT,  0, MPI_COMM_WORLD);
+	MPI_Scatter(problem_set, local_set_sz, MPI_INT, arr_Mine, local_set_sz, MPI_INT,  0, MPI_COMM_WORLD);
 
 	// Initial local sorting
 	QuickSort_IntArr(arr_Mine, local_set_sz);
