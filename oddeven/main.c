@@ -234,16 +234,12 @@ int main(int argc, char *argv[])
 				fprintf(f_out, "%d\n", problem_set[i]);
 			}
 			fclose(f_out);
-			strcpy(output_path, "");
 
-			strcat(output_path, output_dir);
-			strcat(output_path, "jobReport.txt");
-			f_out = fopen(output_path, "w");
-			fprintf(f_out, "Problem set size: %d M integer keys\n", problem_set_size / (1024 * 1024));
-			fprintf(f_out, "Elapsed time: %lf sec\n", t_bench);
+			f_out = fopen("global_time_report.txt", "a");
+			fprintf(f_out, "[Problem set size: %d M & Workers: %d]: %lf sec\n", problem_set_size, comm_sz, t_bench);
+			fclose(f_out);
 		}
 		fclose(f_out);
-		strcpy(output_path, "");
 
 		free(problem_set);
 	}
