@@ -118,6 +118,7 @@ int main(int argc, char *argv[])
 		FILE *f = fopen(output_path, "w");
 		if (f == NULL)
 		{
+			printf("Output file: %s\n", output_path);
 			printf("Cannot open file for problem set write. Ignoring...\n");
 		}
 		else
@@ -221,6 +222,7 @@ int main(int argc, char *argv[])
 		FILE *f_out = fopen(output_path, "w");
 		if (f_out == NULL)
 		{
+			printf("Output file: %s\n", output_path);
 			printf("Cannot open file for output write. Ignoring...\n");
 		}
 		else 
