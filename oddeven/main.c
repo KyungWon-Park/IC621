@@ -60,7 +60,7 @@ int main(void)
 	int problem_set_size;
 	if (my_rank == 0)
 	{
-		printf("Enter problem set size ( * 4 MB): ");
+		printf("Enter problem set size ( * M integer keys): ");
 		scanf("%d", &problem_set_size);
 		problem_set_size = problem_set_size * 1024 * 1024;
 	}
