@@ -131,7 +131,7 @@ int main(int argc, char *argv[])
 		strcpy(output_path, "");
 		printf("\n");
 		printf("Problem set size: %d M __AND__ Number of workers: %d\n", problem_set_size / (1024 * 1024), comm_sz);
-		printf("Problem set generation complete. Entrancing integer sorting routine...\n");
+		printf("Problem set generation complete. Entering integer sorting routine...\n");
 	}
 	double t_start, t_finish, t_elapsed;
 	t_start = MPI_Wtime();
