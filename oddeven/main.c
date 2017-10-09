@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 	char buf[255];
 	char output_dir[255];
 	char output_path[255];	// For later use;
-	// Make a directory for output
+	// Prepare for output
 	if (my_rank == 0)
 	{
 		getcwd(output_dir, 255);
@@ -91,17 +91,7 @@ int main(int argc, char *argv[])
 		sprintf(buf, "%d", (problem_set_size / (1024 * 1024)));
 		strcat(output_dir, buf);
 		strcpy(buf, "");
-		strcat(output_dir, "_M_keys_Result");
-		struct stat dir_stat;
-		if (stat(output_dir, &dir_stat) == -1)
-		{
-			mkdir(output_dir, 0777);
-		}
-		else 
-		{
-			printf("Could not create dir: %s\n", output_dir);
-			assert(0);
-		}
+		strcat(output_dir, "_M_keys_Result_");
 	}
 	
 	// Problem set distribution
@@ -124,7 +114,7 @@ int main(int argc, char *argv[])
 		problem_set = randGen_IntArr(problem_set_size);
 		// WARNING: FILE OPEN
 		strcat(output_path, output_dir);
-		strcat(output_path, "/input.txt");
+		strcat(output_path, "problem_set.txt");
 		FILE *f = fopen(output_path, "w");
 		if (f == NULL)
 		{
@@ -227,7 +217,7 @@ int main(int argc, char *argv[])
 		printf("Sorting has been finished. Elapsed time: %lf\n", t_bench);
 		// WARNING: FILE OPEN
 		strcat(output_path, output_dir);
-		strcat(output_path, "/output_txt");
+		strcat(output_path, "sorted_txt");
 		FILE *f_out = fopen(output_path, "w");
 		if (f_out == NULL)
 		{
@@ -244,7 +234,7 @@ int main(int argc, char *argv[])
 			strcpy(output_path, "");
 
 			strcat(output_path, output_dir);
-			strcat(output_path, "/report.txt");
+			strcat(output_path, "jobReport.txt");
 			f_out = fopen(output_path, "w");
 			fprintf(f_out, "Problem set size: %d M integer keys\n", problem_set_size / (1024 * 1024));
 			fprintf(f_out, "Elapsed time: %lf\n", t_bench);
