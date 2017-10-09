@@ -96,6 +96,11 @@ int main(int argc, char *argv[])
 		{
 			mkdir(output_dir, 0755);
 		}
+		else 
+		{
+			printf("Could not create dir: %s\n", output_dir);
+			assert(0);
+		}
 	}
 	
 	// Problem set distribution
@@ -122,7 +127,7 @@ int main(int argc, char *argv[])
 		FILE *f = fopen(output_path, "w");
 		if (f == NULL)
 		{
-			printf("Cannot open file for write. Ignoring...\n");
+			printf("Cannot open file for problem set write. Ignoring...\n");
 		}
 		else
 		{
@@ -225,7 +230,7 @@ int main(int argc, char *argv[])
 		FILE *f_out = fopen(output_path, "w");
 		if (f_out == NULL)
 		{
-			printf("Cannot open file for write. Ignoring...\n");
+			printf("Cannot open file for output write. Ignoring...\n");
 		}
 		else 
 		{
