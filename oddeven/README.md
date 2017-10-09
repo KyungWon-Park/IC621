@@ -19,3 +19,9 @@ Usage:
 	mpirun -n 4 ./oddeven 8
 
 	-> Runs oddeven with 4 nodes and problem set of 8 M integer keys
+
+Homework:
+
+	just execute do_hw_batch.sh
+
+	sh ./do_hw_batch.sh

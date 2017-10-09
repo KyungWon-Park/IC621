@@ -1,3 +1,4 @@
+make
 mpirun -n 1 ./oddeven 2
 mpirun -n 1 ./oddeven 4
 mpirun -n 1 ./oddeven 8
