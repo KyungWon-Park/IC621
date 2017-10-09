@@ -90,6 +90,7 @@ int main(int argc, char *argv[])
 		strcat(output_dir, buf);
 		strcpy(buf, "");
 		strcat(output_dir, "_M_keys_Result_");
+		printf("Output path: %s\n", output_dir);
 	}
 	
 	// Problem set distribution
