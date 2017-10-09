@@ -215,6 +215,7 @@ int main(int argc, char *argv[])
 	if (my_rank == 0)
 	{
 		printf("Sorting has been finished. Elapsed time: %lf sec\n", t_bench);
+		printf("\n[------*------*------*------*------*------*------*------]\n");
 		// WARNING: FILE OPEN
 		strcat(output_path, output_dir);
 		strcat(output_path, "sorted.txt");
