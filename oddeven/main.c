@@ -153,21 +153,9 @@ int main(int argc, char *argv[])
 		// Sex
 		partner = findPartner(phase, my_rank, comm_sz);
 
-		// Synchronization
-		MPI_Barrier(MPI_COMM_WORLD);
 		if (partner != NO_PARTNER)
 		{
-			// Exchange arr 
-			if (my_rank % 2 == 0)
-			{
-				MPI_Send(arr_Mine, local_set_sz, MPI_INT, partner, 0, MPI_COMM_WORLD);
-				MPI_Recv(arr_notMine, local_set_sz, MPI_INT, partner, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			}
-			else 
-			{
-				MPI_Recv(arr_notMine, local_set_sz, MPI_INT, partner, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-				MPI_Send(arr_Mine, local_set_sz, MPI_INT, partner, 0, MPI_COMM_WORLD);
-			}
+			MPI_Sendrecv(arr_Mine, local_set_sz, MPI_INT, partner, phase, arr_notMine, local_set_sz, MPI_INT, partner, phase, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 
 			// Keep yours
 			if ((my_rank + phase) % 2 == 0)
