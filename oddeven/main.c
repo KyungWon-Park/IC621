@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
 		struct stat dir_stat;
 		if (stat(output_dir, &dir_stat) == -1)
 		{
-			mkdir(output_dir, 0755);
+			mkdir(output_dir, 0777);
 		}
 		else 
 		{
