@@ -1,6 +1,8 @@
 Odd even transposition sorting program
 
-must be ran in mpi environment
+must be run in mpi environment
+
+Check global_time_report.txt after execution
 
 park0kyung0won@gmail.com
 
