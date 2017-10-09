@@ -90,7 +90,6 @@ int main(int argc, char *argv[])
 		strcat(output_dir, buf);
 		strcpy(buf, "");
 		strcat(output_dir, "_M_keys_Result_");
-		printf("Output path: %s\n", output_dir);
 	}
 	
 	// Problem set distribution
@@ -130,6 +129,7 @@ int main(int argc, char *argv[])
 		}
 		fclose(f);
 		strcpy(output_path, "");
+		printf("\n");
 		printf("Problem set generation complete. Entrancing integer sorting routine...\n");
 	}
 	double t_start, t_finish, t_elapsed;
