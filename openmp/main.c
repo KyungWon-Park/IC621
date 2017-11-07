@@ -19,6 +19,15 @@ int main(int argc, char *argv[])
 	int chunksize;
 	enum scheduler mode;
 
+	clock_t start, end;
+	double cpu_time_used;
+
+	if (argc < 2)
+	{
+		printf("Enter one of: { static, dynamic, guided } as a parameter\n");
+		return -1;
+	}
+
 	if (!strcmp(input, st_str))
 	{
 		if (0)
@@ -76,6 +85,7 @@ int main(int argc, char *argv[])
 	fclose(fp);
 
 	// Odd Even Sorting ...
+	start = clock();
 	int i;
 	int tmp;
 	int phase;
@@ -182,6 +192,7 @@ int main(int argc, char *argv[])
 	{
 		return -1;
 	}
+	end = clock();
 
 	// Write sorted set 
 	// FP OPEN: #1
@@ -191,6 +202,9 @@ int main(int argc, char *argv[])
 		fprintf(fp, "%d\n", problem_set[i]);
 	}
 	// FP CLOSE: #1
+	
+	cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+	printf("Elapsed time: %lf sec\n", cpu_time_used);
 	
 	fclose(fp);
 	// FREE:  #0
