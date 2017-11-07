@@ -1,5 +1,5 @@
 // Monte Carlo PI calculator
-
+#define _XOPEN_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -32,16 +32,10 @@ void *toss(void *toss_args)
 	printf("Rank %d local num toss: %lld\n", (*ptr_toss_arg).rank, local_num_toss);
 	for (i = 0; i < local_num_toss; i++)
 	{
-		x = (rand()) / ((double) RAND_MAX);	
-		y = (rand()) / ((double) RAND_MAX);	
+		x = drand48();	
+		y = drand48();	
 		if ((x * x + y * y) <= 1)
 		{	num_in_circle++;	}
-
-		if (i >= (local_num_toss / 100) * (pct + 1))
-		{
-			pct++;
-			printf("Rank %d tossed %d Percent\n", (*ptr_toss_arg).rank, pct);
-		}
 	}
 
 	local_pi = 4 * num_in_circle / ((double) local_num_toss);
@@ -58,13 +52,13 @@ int main(int argc, char *argv[])
 	}
 
 	const int num_threads = atoi(argv[1]);
-	const int tmp_num_toss = atoi(argv[1]);
+	const int tmp_num_toss = atoi(argv[2]);
 
 	// WARNING: MALLOC 0
 	__toss_common__ *ptr_toss_common = malloc(sizeof(__toss_common__) + (sizeof(double) * num_threads));
 	assert(ptr_toss_common != NULL && "malloc failed!\n");
 
-	long long int global_num_toss = (long long int) ((((long long int) tmp_num_toss) * 1024 * 1024 * 1024) / (long long int) num_threads);
+	long long int global_num_toss = (long long int) (((long long int) tmp_num_toss) * 1024 * 1024 * 1024);
 	printf("Global num toss: %lld\n", global_num_toss);
 	(*ptr_toss_common).local_num_toss =  (long long int) (global_num_toss / (long long int) num_threads);
 	printf("Local num toss: %lld\n", (*ptr_toss_common).local_num_toss);
@@ -75,7 +69,7 @@ int main(int argc, char *argv[])
 	thread_handles = malloc(sizeof(pthread_t) * num_threads);
 	assert(thread_handles != NULL && "malloc failed!\n");
 
-	srand((unsigned int) time(NULL));
+	clock_t start = clock(), diff;
 	__toss_args__ toss_args[num_threads];
 	for (thread = 0; thread < num_threads; thread++)
 	{
@@ -98,8 +92,11 @@ int main(int argc, char *argv[])
 		printf("PI_estimate: %lf\n", PI_estimate);
 	}
 	PI_estimate = PI_estimate / num_threads;
-
+	
+	diff = clock() - start;
+	int msec = diff * 1000 / CLOCKS_PER_SEC;
 	printf("Num threads: %d, Num tosses: %d B, Pi estimate: %lf\n", num_threads, tmp_num_toss, PI_estimate);
+	printf("Elapsed time: %d.%d sec\n", msec/1000, msec%1000);
 
 	free(ptr_toss_common);
 	free(thread_handles);

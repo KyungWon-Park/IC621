@@ -1,5 +1,5 @@
 CC = mpicc 
-FLAG = -O3 
+FLAG = -O3 -g
 
 all: main.o quicksort.o
 	$(CC) $(FLAG) main.o quicksort.o -o oddeven 

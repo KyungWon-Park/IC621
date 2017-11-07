@@ -5,4 +5,4 @@ clean:
 	rm *.o pi
 
 main.o: main.c 
-	gcc -O3 -c -lpthread main.c
+	gcc -O3 -c -lpthread  main.c
