@@ -4,7 +4,7 @@
 #include <string.h>
 #include <assert.h>
 
-#define CHUNK 1
+#define CHUNK 100
 
 enum scheduler {STATIC, DYNAMIC, GUIDED};
 
