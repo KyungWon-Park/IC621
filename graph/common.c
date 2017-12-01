@@ -3,11 +3,9 @@
 #include <stdbool.h>
 #include <time.h>
 #include <limits.h>
+#include "common.h"
 
-#define NUM_OF_CITY 15
-#define UNDEFINED -8926974
-
-const int MAP[NUM_OF_CITY][NUM_OF_CITY] = {
+int MAP[NUM_OF_CITY][NUM_OF_CITY] = {
 	{ 0, 83, 86, 77, 15, 93, 35, 86, 92, 49, 21, 62, 27, 90, 59},
 	{63,  0, 26, 40, 26, 72, 36, 11, 68, 67, 29, 82, 30, 62, 23},
 	{67, 35,  0, 29,  2, 22, 58, 69, 67, 93, 56, 11, 42, 29, 73},
@@ -23,77 +21,6 @@ const int MAP[NUM_OF_CITY][NUM_OF_CITY] = {
 	{34, 64, 24, 14, 87, 56, 43, 91, 27, 65, 59, 36,  0, 32, 51},
 	{37, 28, 75,  7, 74, 21, 58, 95, 29, 37, 35, 93, 18,  0, 28},
 	{43, 11, 28, 29, 76,  4, 43, 63, 13, 38,  6, 40,  4, 18,  0}};
-
-typedef enum {PENDING, WORKING, STOLEN, FINISHED} __state__;
-
-typedef struct 
-{
-	__state__ state;	
-	int hops;
-	int travel_dist;
-	int history[NUM_OF_CITY];
-} __tour__;
-
-typedef struct 
-{
-	struct __stack__ *addr;
-	int bp;
-	int sp;
-	__tour__ pile[0];
-} __stack__;
-
-int greedyDist(void)
-{	// Greedy tour distance for aggressive pruning
-	__tour__ grdy_tour;
-	grdy_tour.hops = 0;
-	grdy_tour.history[0] = 0;
-	grdy_tour.travel_dist = 0;
-
-	for (int idx_hist = 0; idx_hist < NUM_OF_CITY - 1; idx_hist++)
-	{	// Fill travel history one by one
-		int closest_nbr = UNDEFINED;
-		int closest_dist = INT_MAX;
-
-		for (int nbr = 1; nbr < NUM_OF_CITY; nbr++)
-		{	// Get closest neighbor city for current city (idx_hist)
-			for (int idx_city = 0; idx_city <= grdy_tour.hops; idx_city++)
-			{	//	Check if grdy_tour.history[idx_city] was visited
-				if (nbr == grdy_tour.history[idx_city])
-				{
-					break;
-				}
-				else 
-				{
-					int fromheretothere = MAP[idx_hist][nbr];
-					if (fromheretothere < closest_dist)
-					{
-						closest_nbr = nbr;
-						closest_dist = fromheretothere;
-					}
-				}
-			}
-		}
-
-		grdy_tour.history[idx_hist + 1] = closest_nbr;
-		grdy_tour.travel_dist += closest_dist;
-	}
-
-	int total_dist = grdy_tour.travel_dist + MAP[grdy_tour.history[NUM_OF_CITY]][0];
-
-	printf(" -------------  GREEDY TRAVEL RESULT --------------- \n");
-	printf("Travel distance: %d\n", total_dist);
-	printf("Travel Path: ");
-	for (int i = 0; i < NUM_OF_CITY; i++)
-	{
-		printf("%d -> ", grdy_tour.history[i]);
-	}
-	printf("0\n");
-	printf("\n ------------ PRESS ENTER TO CONTINUE -------------- ");
-	char tmp;
-	scanf("%c", &tmp);
-
-	return total_dist;
-}
 
 int randomDist(void)
 {	// Returns random tour distance for aggressive pruning
@@ -131,13 +58,24 @@ int randomDist(void)
 
 	int total_dist = rand_tour.travel_dist + MAP[NUM_OF_CITY][0];
 
+	printf("Graph at this random trial: ");
+	for (int i = 0; i < NUM_OF_CITY - 1; i++)
+	{
+		printf("%d -> ", rand_tour.history[i]);
+	}
+	printf("%d\n", rand_tour.history[NUM_OF_CITY - 1]);
+	printf("Distance at this trial: %d\n", total_dist);
+	printf("\n Press Enter to Continue \n");
+	char tmp;
+	scanf("%c", &tmp);
+
 	return total_dist;
 }
 
 int initDist(void)
 {
 	int best_dist;
-	best_dist = greedyDist();
+	best_dist = INT_MAX;
 	for (int i = 0; i < NUM_OF_CITY; i++)
 	{
 		int rand_dist = randomDist();
@@ -146,5 +84,10 @@ int initDist(void)
 			best_dist = rand_dist;
 		}
 	}
+
+	printf("Best distance so far: %d\n", best_dist);
+	printf("Press Enter to continure\n");
+	char tmp;
+	scanf("%c", &tmp);
 	return best_dist;
 }
