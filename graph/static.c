@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
 	// Best tour not found yet
 	best_tour.hops = NUM_OF_CITY + 1;
 	// best_tour.travel_dist = greedyDistance();
+	srand((unsigned int) time(NULL));
 	best_tour.travel_dist = initDist();
 
 	// Set up current tour. Only have visited city 0
@@ -79,13 +80,14 @@ int main(int argc, char *argv[])
 						(*p_stack).sp++;
 						memcpy(&(*p_stack).pile[(*p_stack).sp], &curr_tour, COPYSIZE);
 
-						// For DEBUG only
+#ifdef DEBUG
 						printf("Current tour: ");
 						for (int j = 0; j <= curr_tour.hops; j++)
 						{
 							printf("%d -> ", curr_tour.history[j]);
 						}
 						printf("0\n");
+#endif
 
 						// Now roll back curr_tour to previous state since we have pushed it to stack
 						curr_tour.travel_dist -= fromheretothere;

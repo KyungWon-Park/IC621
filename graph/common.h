@@ -6,6 +6,7 @@
 
 #define NUM_OF_CITY 15
 #define UNDEFINED -8926974
+//#define DEBUG 1
 
 extern int MAP[NUM_OF_CITY][NUM_OF_CITY];
 

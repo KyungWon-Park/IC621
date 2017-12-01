@@ -22,6 +22,62 @@ int MAP[NUM_OF_CITY][NUM_OF_CITY] = {
 	{37, 28, 75,  7, 74, 21, 58, 95, 29, 37, 35, 93, 18,  0, 28},
 	{43, 11, 28, 29, 76,  4, 43, 63, 13, 38,  6, 40,  4, 18,  0}};
 
+int greedyDist(void)
+{
+	__tour__ grdy_tour;
+	grdy_tour.hops = 0;
+	grdy_tour.history[0] = 0;
+	grdy_tour.travel_dist = 0;
+
+	for (int idx_hist = 0; idx_hist < NUM_OF_CITY - 1; idx_hist++)
+	{	// Select next city one by one, following greedy algorithm
+		int next_city;
+		int next_city_dist = INT_MAX;
+		for (int i = 1; i < NUM_OF_CITY; i++)
+		{	// Pick one city i
+			bool beenthere = false; 
+			for (int j = 0; j <= grdy_tour.hops; j++)
+			{	// Check if this city i was visited before
+				if (i == grdy_tour.history[j])
+				{
+					beenthere = true;
+					break;
+				}
+			}
+
+			if (!beenthere) 
+			{
+				int fromheretothere = MAP[grdy_tour.history[idx_hist]][i];
+				if (fromheretothere < next_city_dist)
+				{
+					next_city_dist = fromheretothere;
+					next_city = i;
+				}
+			}
+		}
+
+		grdy_tour.history[idx_hist + 1] = next_city;
+		grdy_tour.hops++;
+		grdy_tour.travel_dist += next_city_dist;
+	}
+
+#ifdef DEBUG
+	printf("Greedy tour path: ");
+	for (int i = 0; i < NUM_OF_CITY; i++)
+	{
+		printf("%d -> ", grdy_tour.history[i]);
+	}
+	printf("%d\n", 0);
+
+	printf("Total greedy tour distance: %d\n", grdy_tour.travel_dist);
+	char tmp;
+	printf("\nPress Enter to Continue\n");
+	scanf("%c", &tmp);
+#endif
+
+	return grdy_tour.travel_dist;
+}
+
 int randomDist(void)
 {	// Returns random tour distance for aggressive pruning
 	__tour__ rand_tour;
@@ -29,13 +85,12 @@ int randomDist(void)
 	rand_tour.history[0] = 0;
 	rand_tour.travel_dist = 0;
 
-	srand((unsigned int) time(NULL));
 	for (int idx_hist = 1; idx_hist < NUM_OF_CITY; idx_hist++)
 	{	// Fill history with random cities
 		int next_city = UNDEFINED;
 		bool beenthere = false;
 		do 
-		{	// Do lottery till we fill history with random cities but each city used for once
+		{	// Do lottery till we fill history with random cities but each city visited only once
 			next_city = (rand() % NUM_OF_CITY);
 			for (int idx_city = 0; idx_city <= rand_tour.hops; idx_city++)
 			{	// Roll dice again if city has been visited before
@@ -53,21 +108,23 @@ int randomDist(void)
 		} while (beenthere);
 
 		rand_tour.hops++;
-		rand_tour.travel_dist += MAP[idx_hist - 1][idx_hist];
+		rand_tour.travel_dist += MAP[rand_tour.history[idx_hist - 1]][rand_tour.history[idx_hist]];
 	}
 
 	int total_dist = rand_tour.travel_dist + MAP[NUM_OF_CITY][0];
 
+#ifdef DEBUG 
 	printf("Graph at this random trial: ");
-	for (int i = 0; i < NUM_OF_CITY - 1; i++)
+	for (int i = 0; i < NUM_OF_CITY; i++)
 	{
 		printf("%d -> ", rand_tour.history[i]);
 	}
-	printf("%d\n", rand_tour.history[NUM_OF_CITY - 1]);
+	printf("%d\n", 0);
 	printf("Distance at this trial: %d\n", total_dist);
 	printf("\n Press Enter to Continue \n");
 	char tmp;
 	scanf("%c", &tmp);
+#endif
 
 	return total_dist;
 }
@@ -75,7 +132,7 @@ int randomDist(void)
 int initDist(void)
 {
 	int best_dist;
-	best_dist = INT_MAX;
+	best_dist = greedyDist();
 	for (int i = 0; i < NUM_OF_CITY; i++)
 	{
 		int rand_dist = randomDist();
@@ -85,9 +142,13 @@ int initDist(void)
 		}
 	}
 
+#ifdef DEBUG 
 	printf("Best distance so far: %d\n", best_dist);
 	printf("Press Enter to continure\n");
+	printf("I'll do pruning with this distance info\n");
 	char tmp;
 	scanf("%c", &tmp);
+#endif 
+
 	return best_dist;
 }
