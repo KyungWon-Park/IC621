@@ -28,9 +28,4 @@ typedef struct
 	__tour__ pile[0];
 } __stack__;
 
-int greedyDist(void);
-
-int randomDist(void);
-
 int initDist(void);
-
