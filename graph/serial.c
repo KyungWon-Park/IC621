@@ -5,94 +5,7 @@
 #include <time.h>
 #include <pthread.h>
 #include <assert.h>
-
-#define NUM_OF_CITY 15
-#define UNDEFINED -8926974
-#define STOLEN -1234899
-
-const int MAP[NUM_OF_CITY][NUM_OF_CITY] = {
-	{ 0, 83, 86, 77, 15, 93, 35, 86, 92, 49, 21, 62, 27, 90, 59},
-	{63,  0, 26, 40, 26, 72, 36, 11, 68, 67, 29, 82, 30, 62, 23},
-	{67, 35,  0, 29,  2, 22, 58, 69, 67, 93, 56, 11, 42, 29, 73},
-	{21, 19, 84,  0, 37, 98, 24, 15, 70, 13, 26, 91, 80, 56, 73},
-	{62, 70, 96, 81,  0,  5, 25, 84, 27, 36,  5, 46, 29, 13, 57},
-	{24, 95, 82, 45, 14,  0, 67, 34, 64, 43, 50, 87,  8, 76, 78},
-	{88, 84,  3, 51, 54, 99,  0, 32, 60, 76, 68, 39, 12, 26, 86},
-	{94, 39, 95, 70, 34, 78, 67,  0,  1, 97,  2, 17, 92, 52, 56},
-	{ 1, 80, 86, 41, 65, 89, 44, 19,  0, 40, 29, 31, 17, 97, 71},
-	{81, 75,  9, 27, 67, 56, 97, 53, 86,  0, 65,  6, 83, 19, 24},
-	{28, 71, 32, 29,  3, 19, 70, 68,  8, 15,  0, 40, 49, 96, 23},
-	{18, 45, 46, 51, 21, 55, 79, 88, 64, 28, 41,  0, 50, 93, 99},
-	{34, 64, 24, 14, 87, 56, 43, 91, 27, 65, 59, 36,  0, 32, 51},
-	{37, 28, 75,  7, 74, 21, 58, 95, 29, 37, 35, 93, 18,  0, 28},
-	{43, 11, 28, 29, 76,  4, 43, 63, 13, 38,  6, 40,  4, 18,  0}};
-
-typedef struct 
-{
-	int hops;
-	int travel_dist;
-	int history[NUM_OF_CITY];
-} __tour__;
-
-typedef struct 
-{
-	struct __stack__ *addr;
-	int bp;
-	int sp;
-	__tour__ pile[0];
-} __stack__;
-
-int greedyDistance(void)
-{	// For aggressive pruning
-	__tour__ greedy_tour;
-	greedy_tour.hops = 0;
-	greedy_tour.history[greedy_tour.hops] = 0;
-	greedy_tour.travel_dist = 0;
-
-	for (int i = 0; i < NUM_OF_CITY - 1; i++)
-	{	// Fill travel history one by one
-		int closest = UNDEFINED;
-		int closest_dist = INT_MAX;
-
-		for (int nbr = 0; nbr < NUM_OF_CITY; nbr++)
-		{	// Closest from history[i]
-			int ivebeenthere = 0;
-			for (int k = 0; k <= greedy_tour.hops; k++)
-			{	// Check was j in history
-				if (nbr == greedy_tour.history[k])
-				{
-					ivebeenthere = 1;
-				}
-
-				int fromheretothere = MAP[i][nbr];
-				if ((!ivebeenthere) && (fromheretothere < closest_dist))
-				{
-					closest = nbr;
-					closest_dist = fromheretothere;
-				}
-			}
-		}
-
-		greedy_tour.history[i + 1] = closest;
-		greedy_tour.travel_dist += closest_dist;
-	}
-
-	int total_dist = greedy_tour.travel_dist + MAP[greedy_tour.history[NUM_OF_CITY]][0];
-
-	printf(" -------------  GREEDY TRAVEL RESULT --------------- \n");
-	printf("Travel distance: %d\n", total_dist);
-	printf("Travel Path: ");
-	for (int i = 0; i < NUM_OF_CITY; i++)
-	{
-		printf("%d -> ", greedy_tour.history[i]);
-	}
-	printf("0\n");
-	printf("\n ------------ PRESS ENTER TO CONTINUE -------------- ");
-	char tmp;
-	scanf("%c", &tmp);
-
-	return total_dist;
-}
+#include "common.h"
 
 int main(int argc, char *argv[])
 {
@@ -104,10 +17,9 @@ int main(int argc, char *argv[])
 	assert(p_stack != NULL && "MALLOC FAILED!\n");
 
 	// Initialization
-	// Best tour not found yet
 	best_tour.hops = NUM_OF_CITY + 1;
-	// best_tour.travel_dist = greedyDistance();
-	best_tour.travel_dist = INT_MAX;
+	srand((unsigned int) time(NULL));
+	best_tour.travel_dist = initDist();
 
 	// Set up current tour. Only have visited city 0
 	curr_tour.hops = 0;
@@ -166,13 +78,14 @@ int main(int argc, char *argv[])
 						(*p_stack).sp++;
 						memcpy(&(*p_stack).pile[(*p_stack).sp], &curr_tour, COPYSIZE);
 
-						// For DEBUG only
+#ifdef DEBUG
 						printf("Current tour: ");
 						for (int j = 0; j <= curr_tour.hops; j++)
 						{
 							printf("%d -> ", curr_tour.history[j]);
 						}
 						printf("0\n");
+#endif
 
 						// Now roll back curr_tour to previous state since we have pushed it to stack
 						curr_tour.travel_dist -= fromheretothere;

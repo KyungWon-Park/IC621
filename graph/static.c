@@ -6,114 +6,99 @@
 #include <pthread.h>
 #include <assert.h>
 #include "common.h"
+#include <pthread.h>
+
+int n_threads;	// Number of threads
+int stack_start_level; // In which level of tree each threads will start?
+int stack_size; // Stack size per threads
+int COPYSIZE;
+
+void stackSize(void)
+{	// Decide size of stack for each threads and judge stack start level (In which floor all threads will start to work?)
+	// Must be called after n_threads has been initialized
+	const int num_t = n_threads;
+	for (int i = 0; (NUM_OF_CITY ^ i) <= num_t; i++)
+	{
+		if ((NUM_OF_CITY ^ i) == num_t)
+		{	// IF NUM_OF_CITY ^ i is equal with number of threads, then level i should be the floor that threads will start to work
+			stack_start_level = i;
+			break;
+		}
+		else if (((NUM_OF_CITY ^ (i + 1)) >= num_t))
+		{	// IF NUM_OF_CITY ^ i is smaller than number of threads and NUM_OF_CITY ^ (i + 1) is bigger than number of threads, then (i + 1) is the right floor
+			stack_start_level = i + 1;
+			break;
+		}
+		// stack_start_level 0 means "0" in job stack
+		// stack_start_level 1 means "0 -> 1" or "0 -> 2" or "0 -> 3" ...
+		// stack_start_level 2 means "0 -> 1 -> 2" or "0 -> 1 -> 3" ...
+	}
+
+	stack_size = ((NUM_OF_CITY - stack_start_level) * (NUM_OF_CITY - stack_start_level - 1) / 2) + ((NUM_OF_CITY ^ stack_start_level) / n_threads);
+
+	return;
+}
+
+int factorial(int n)
+{	// Returns factorial
+	int fact = 1;
+	for (int i = 1; i <= n; i++)
+	{
+		fact = fact * i;
+	}
+	return fact;
+}
+
+int perm(int r)
+{	// Returns (NUM_OF_CITY - 1)_P_r
+	int ans;
+	int n = NUM_OF_CITY - 1; // Because starting city is 0, and we don't need to visit there ever again in the middle of journey
+	ans = factorial(n) / factorial(n - r);
+	return ans;
+}
+
+void perm_list(int r, int *arr_perm)
+{	// Returns array of possible permutations, (NUM_OF_CITY -1)_P_r
+	for (int i = 0; i < perm(r); i++)
+	{	// For number of (NUM_OF_CITY - 1)_P_r times,
+	}
+	return;
+}
+
+void stackInitManager(__stack__ *stack_t)
+{	// Create initial stack, and toss them to each thread's stacks
+	// Create my stack to work on 
+	// WARNTING: MALLOC 0
+	__stack__ *my_stack = malloc(sizeof(__stack__) + sizeof(__tour__) * (NUM_OF_CITY ^ stack_start_level));
+	assert(my_stack != NULL && "Malloc Failed!\n");
+	// Initialize my_stack
+	(*my_stack).bp = -1;
+	(*my_stack).sp = -1;
+
+	// WARNING: FREE 0
+	free(my_stack);
+	return;
+}
+
+void *local_job_func(void *local_arg)
+{
+	return NULL;
+}
 
 int main(int argc, char *argv[])
 {
-	// Declaration
-	__tour__ best_tour;   // Best tour so far
-	__tour__ curr_tour;        // Current tour
-	// WARNING: MALLOC 0
-	__stack__ *p_stack = malloc(sizeof(__stack__) + sizeof(__tour__) * (((NUM_OF_CITY * NUM_OF_CITY) + NUM_OF_CITY) / 2));
-	assert(p_stack != NULL && "MALLOC FAILED!\n");
-
-	// Initialization
-	// Best tour not found yet
-	best_tour.hops = NUM_OF_CITY + 1;
-	// best_tour.travel_dist = greedyDistance();
-	srand((unsigned int) time(NULL));
-	best_tour.travel_dist = initDist();
-
-	// Set up current tour. Only have visited city 0
-	curr_tour.hops = 0;
-	curr_tour.history[curr_tour.hops] = 0;
-	curr_tour.travel_dist = 0;
-
-	// Initialize stack, push curr_tour into it
-	(*p_stack).bp = -1;		// bp tells, from this index below, stack pile is empty(or invalid data)
-	const int COPYSIZE = sizeof(__tour__);
-	memcpy(&(*p_stack).pile[(*p_stack).sp], &curr_tour, COPYSIZE);
-	(*p_stack).sp = 0;		// sp telss, this index is the last valid data which can be poped from stack pile
-
-	// Begin stopwatch
-	clock_t time_begin = clock();
-
-	while ((*p_stack).sp >=0)
-	{	// Only while stack is not empty
-		// Pop one "tour" from stack
-		curr_tour = (*p_stack).pile[(*p_stack).sp];
-		(*p_stack).sp--;
-
-		if (curr_tour.hops == NUM_OF_CITY - 1)
-		{	// Then next dest is hometown
-			int total_dist = curr_tour.travel_dist + MAP[curr_tour.history[NUM_OF_CITY - 1]][0];
-			if ( total_dist < best_tour.travel_dist)
-			{	// curr_tour is superior than best_tour found so far. So let's update best tour to curr tour
-				memcpy(best_tour.history, curr_tour.history, (sizeof(int) * (NUM_OF_CITY)));
-				best_tour.travel_dist = total_dist;
-			}
-		}
-		else
-		{	// Still far away to go
-			for (int nbr = NUM_OF_CITY - 1; nbr >= 1; nbr--)
-			{	// Iterate over all neighbors. Do it in backward to keep order of traversal
-				int ivebeenthere = 0;
-				for (int i = 0; i <= curr_tour.hops; i++)
-				{	// Check if already visited
-					if (nbr == curr_tour.history[i])
-					{
-						ivebeenthere = 1;
-						break;
-					}
-				}
-
-				if (!ivebeenthere)
-				{	// Never been there
-					// Set this neighbor to next destination
-					int fromheretothere = MAP[curr_tour.history[curr_tour.hops]][nbr];
-					if (curr_tour.travel_dist + fromheretothere <= best_tour.travel_dist)
-					{	// Pruning. Visit only if it still has chance to be the best tour
-						curr_tour.hops++;
-						curr_tour.history[curr_tour.hops] = nbr;
-						curr_tour.travel_dist += fromheretothere;
-
-						// Now push this travel plan to stack
-						(*p_stack).sp++;
-						memcpy(&(*p_stack).pile[(*p_stack).sp], &curr_tour, COPYSIZE);
-
-#ifdef DEBUG
-						printf("Current tour: ");
-						for (int j = 0; j <= curr_tour.hops; j++)
-						{
-							printf("%d -> ", curr_tour.history[j]);
-						}
-						printf("0\n");
-#endif
-
-						// Now roll back curr_tour to previous state since we have pushed it to stack
-						curr_tour.travel_dist -= fromheretothere;
-						curr_tour.hops--;
-					}
-				}
-			}
-		}
-	}
-
-	// WARNING: FREE 0
-	free(p_stack);
-
-	// Stop stopwatch
-	clock_t time_end = clock();
-	double time_spent = (double)(time_end - time_begin) / CLOCKS_PER_SEC;
-
-	printf("\n --------------- FINISHED ------------------- \n\n");
-	printf("Elapsed time: %lf secs\n", time_spent);
-	printf("Best tour distance: %d\n", best_tour.travel_dist);
-	printf("Best tour history: ");
-	for (int i = 0; i <= NUM_OF_CITY - 1; i++)
+	// Get number of threads to create
+	if (argc == 2)
 	{
-		printf("%d -> ", best_tour.history[i]);
+		n_threads = atoi(argv[1]);
 	}
-	printf("0\n");
+	else 
+	{
+		n_threads = 1;
+	}
+	
+	// Initialize necessary variables
+	COPYSIZE = sizeof(__tour__);
 
 	return 0;
 }
